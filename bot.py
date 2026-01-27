@@ -11,7 +11,7 @@ from aiohttp import web
 TOKEN = "8444997622:AAGjmBYxYq79JxGT9kf8bu1n9lKmw5y_Ko0"
 
 # 👇 СЮДА ВСТАВЬ СВОЙ CHAT_ID (узнать через @userinfobot)
-YOUR_CHAT_ID = None  # Например: 123456789
+YOUR_CHAT_ID = 1380431564  # Например: 123456789
 
 bot = Bot(
     token=TOKEN, 
