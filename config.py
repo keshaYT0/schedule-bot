@@ -1,8 +1,5 @@
 import os
 from zoneinfo import ZoneInfo
-from dotenv import load_dotenv
-
-load_dotenv()
 
 TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = int(os.getenv("CHAT_ID"))
