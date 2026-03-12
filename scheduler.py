@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from config import TZ, DAYS_RU
 
-_data_path = Path(__file__).parent / "data" / "schedule.json"
+_data_path = Path(__file__).parent / "schedule.json"
 
 with open(_data_path, encoding="utf-8") as f:
     SCHEDULE = json.load(f)
