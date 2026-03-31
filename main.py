@@ -78,17 +78,19 @@ async def start_server():
     app.router.add_get("/", health)
     runner = web.AppRunner(app)
     await runner.setup()
-    await web.TCPSite(runner, "0.0.0.0", 8080).start()
+    port = int(os.environ.get("PORT", 8080))  # Рендер выдает порт через переменную окружения
+    await web.TCPSite(runner, "0.0.0.0", port).start()
 
 
 async def main():
-    logging.info("Bot starting…")
+    logging.info(f"Bot starting on port {os.environ.get('PORT', 8080)}...")
     asyncio.create_task(start_server())
     asyncio.create_task(reminder_loop())
     await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
+    import os
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s  %(levelname)-8s  %(message)s",
