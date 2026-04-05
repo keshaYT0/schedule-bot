@@ -93,19 +93,34 @@ async def reminder_loop() -> None:
 # ── Main ─────────────────────────────────────────────────────
 
 async def main() -> None:
-    """Start all subsystems concurrently."""
+    """Start all subsystems concurrently with controlled lifecycle."""
     logging.info(
         "Bot starting  ·  PORT=%s  ·  polling mode",
         os.getenv("PORT", "8080"),
     )
 
-    # Fire-and-forget background tasks
-    await start_health_server()
-    asyncio.create_task(keepalive_loop())
-    asyncio.create_task(reminder_loop())
+    health_runner = None
+    try:
+        # Start core components
+        health_runner = await start_health_server()
+        asyncio.create_task(keepalive_loop())
+        asyncio.create_task(reminder_loop())
 
-    # Blocking — runs until the process is terminated
-    await dp.start_polling(bot)
+        # Main polling loop (blocking)
+        await dp.start_polling(bot)
+
+    except (KeyboardInterrupt, SystemExit, asyncio.CancelledError):
+        logging.info("Bot is shutting down...")
+    except Exception as exc:
+        logging.exception("Fatal error during bot execution: %s", exc)
+    finally:
+        # Graceful shutdown of the health server
+        if health_runner:
+            logging.info("Stopping health-check server...")
+            await health_runner.cleanup()
+            logging.info("Health-check server stopped.")
+
+        logging.info("Bot stopped.")
 
 
 if __name__ == "__main__":

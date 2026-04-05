@@ -61,18 +61,16 @@ async def _health_handler(request: web.Request) -> web.Response:
 #  Web-server lifecycle
 # ---------------------------------------------------------------------------
 
-async def start_health_server() -> None:
+async def start_health_server() -> web.AppRunner:
     """Start an ``aiohttp`` web server that binds to ``$PORT``.
 
-    Render requires every Web Service to bind a port; otherwise the
-    deploy is marked as failed.  The server exposes a single
-    ``/health`` route used by external uptime monitors and by the
-    internal self-ping task.
+    Returns:
+        The ``web.AppRunner`` instance for future cleanup/shutdown.
     """
     app = web.Application()
     app.router.add_get("/health", _health_handler)
 
-    runner = web.AppRunner(app, access_log=None)   # suppress per-request logs
+    runner = web.AppRunner(app, access_log=None)
     await runner.setup()
 
     port: int = int(os.getenv("PORT", "8080"))
@@ -80,6 +78,7 @@ async def start_health_server() -> None:
     await site.start()
 
     logger.info("Health-check server listening on 0.0.0.0:%s", port)
+    return runner
 
 
 # ---------------------------------------------------------------------------
