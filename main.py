@@ -107,6 +107,8 @@ async def main() -> None:
         asyncio.create_task(reminder_loop())
 
         # Clear pending updates and drop webhooks (fixes Conflict errors on restart)
+        logging.info("Waiting for old sessions to terminate (5s)...")
+        await asyncio.sleep(5)
         logging.info("Cleaning up pending updates...")
         await bot.delete_webhook(drop_pending_updates=True)
 
