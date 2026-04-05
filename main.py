@@ -106,6 +106,10 @@ async def main() -> None:
         asyncio.create_task(keepalive_loop())
         asyncio.create_task(reminder_loop())
 
+        # Clear pending updates and drop webhooks (fixes Conflict errors on restart)
+        logging.info("Cleaning up pending updates...")
+        await bot.delete_webhook(drop_pending_updates=True)
+
         # Main polling loop (blocking)
         await dp.start_polling(bot)
 
