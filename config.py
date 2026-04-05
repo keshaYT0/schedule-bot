@@ -43,3 +43,12 @@ BELLS = [
     ("6 пара", "16:50", "18:10"),
     ("7 пара", "18:15", "19:35"),
 ]
+
+# ── Render keep-alive ────────────────────────────────────────
+#  RENDER_EXTERNAL_URL — the public URL assigned by Render,
+#  e.g. "https://schedule-bot-xxxx.onrender.com".
+#  If left empty, the self-ping loop is disabled (safe for local dev).
+RENDER_EXTERNAL_URL: str | None = os.getenv("RENDER_EXTERNAL_URL")
+
+#  Ping interval — must be shorter than Render's 15-min idle timeout.
+KEEPALIVE_INTERVAL_SEC: int = int(os.getenv("KEEPALIVE_INTERVAL_SEC", "600"))
