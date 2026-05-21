@@ -29,6 +29,16 @@ def progress_bar(current: int, total: int, length: int = 10) -> str:
     return f"{bar} {pct}%"
 
 
+def get_lesson_num(start_time: str) -> int:
+    """Определяет номер пары по времени ее начала на основе BELLS из config.py."""
+    from config import BELLS
+    for name, start, _ in BELLS:
+        parts = name.split()
+        if parts and parts[0].isdigit() and start == start_time:
+            return int(parts[0])
+    return 4  # фоллбек по умолчанию
+
+
 # ── форматирование одного дня ────────────────────────────────
 def format_day(day_name: str) -> str:
     lessons = SCHEDULE.get(day_name)
@@ -36,7 +46,8 @@ def format_day(day_name: str) -> str:
         return "🏖 Выходной. Пар нет."
 
     lines = []
-    for i, lesson in enumerate(lessons, start=4):
+    for lesson in lessons:
+        i = get_lesson_num(lesson["start"])
         lines.append(
             f"┌ <b>{i} пара</b>  ·  {lesson['start']} – {lesson['end']}\n"
             f"│ 📖 {lesson['name']}\n"
@@ -55,7 +66,8 @@ def format_week() -> str:
             continue
         header = f"━━━  <b>{rus}</b>  ━━━"
         items = []
-        for i, lesson in enumerate(lessons, start=4):
+        for lesson in lessons:
+            i = get_lesson_num(lesson["start"])
             items.append(
                 f"  {i}. {lesson['start']}–{lesson['end']}  "
                 f"<b>{lesson['name']}</b>\n"
@@ -67,12 +79,13 @@ def format_week() -> str:
 
 # ── текущая пара ─────────────────────────────────────────────
 def current_lesson(day_name: str, current_minutes: int) -> dict | None:
-    for i, lesson in enumerate(SCHEDULE.get(day_name, []), start=4):
+    for lesson in SCHEDULE.get(day_name, []):
         start = _to_minutes(lesson["start"])
         end = _to_minutes(lesson["end"])
         if start <= current_minutes <= end:
             elapsed = current_minutes - start
             total = end - start
+            i = get_lesson_num(lesson["start"])
             return {
                 **lesson,
                 "num": i,
@@ -86,9 +99,10 @@ def current_lesson(day_name: str, current_minutes: int) -> dict | None:
 
 # ── следующая пара ───────────────────────────────────────────
 def next_lesson(day_name: str, current_minutes: int) -> dict | None:
-    for i, lesson in enumerate(SCHEDULE.get(day_name, []), start=4):
+    for lesson in SCHEDULE.get(day_name, []):
         start = _to_minutes(lesson["start"])
         if start > current_minutes:
+            i = get_lesson_num(lesson["start"])
             return {
                 **lesson,
                 "num": i,
@@ -101,12 +115,13 @@ def next_lesson(day_name: str, current_minutes: int) -> dict | None:
 def get_reminder_times(day_name: str, before_min: int) -> list[dict]:
     """Возвращает список {time_hhmm, lesson_name, lesson_num}."""
     result = []
-    for i, lesson in enumerate(SCHEDULE.get(day_name, []), start=4):
+    for lesson in SCHEDULE.get(day_name, []):
         start = _to_minutes(lesson["start"])
         remind_at = start - before_min
         if remind_at < 0:
             continue
         h, m = divmod(remind_at, 60)
+        i = get_lesson_num(lesson["start"])
         result.append({
             "time_hhmm": f"{h:02d}:{m:02d}",
             "lesson_name": lesson["name"],

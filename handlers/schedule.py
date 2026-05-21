@@ -8,6 +8,7 @@ from scheduler import (
     now_almaty, format_day, format_week,
     current_lesson, next_lesson,
 )
+from settings import are_reminders_enabled, set_reminders_enabled
 
 router = Router()
 
@@ -35,7 +36,10 @@ async def cmd_help(message: types.Message):
     await message.answer(
         "📖 <b>Список команд</b>\n\n"
         "/start — перезапустить бота\n"
-        "/help — эта справка\n\n"
+        "/help — эта справка\n"
+        "/mute — выключить авто-уведомления (режим практики)\n"
+        "/unmute — включить авто-уведомления обратно\n"
+        "/status — проверить статус уведомлений\n\n"
         "<b>Кнопки:</b>\n"
         "📅 Сегодня / Завтра — расписание\n"
         "📚 Сейчас — текущая пара\n"
@@ -184,3 +188,45 @@ async def cb_day(callback: types.CallbackQuery):
         reply_markup=weekday_inline_kb(),
     )
     await callback.answer()
+
+
+# ── Управление уведомлениями (Режим практики) ────────────────
+async def is_user_admin(message: types.Message) -> bool:
+    if message.chat.type == "private":
+        return True
+    try:
+        member = await message.chat.get_member(message.from_user.id)
+        return member.status in ("creator", "administrator")
+    except Exception:
+        return True
+
+
+@router.message(Command("mute", "silent"))
+async def cmd_mute(message: types.Message):
+    if not await is_user_admin(message):
+        await message.answer("❌ У вас нет прав для отключения уведомлений (нужны права администратора).")
+        return
+    set_reminders_enabled(False)
+    await message.answer(
+        "🔇 <b>Уведомления отключены!</b>\n\n"
+        "Бот больше не будет присылать утренние сводки и напоминания о парах.\n"
+        "Вы по-прежнему можете запрашивать расписание вручную через кнопки."
+    )
+
+
+@router.message(Command("unmute", "active"))
+async def cmd_unmute(message: types.Message):
+    if not await is_user_admin(message):
+        await message.answer("❌ У вас нет прав для включения уведомлений (нужны права администратора).")
+        return
+    set_reminders_enabled(True)
+    await message.answer(
+        "🔔 <b>Уведомления включены!</b>\n\n"
+        "Бот снова будет присылать утренние сводки в 12:00 и напоминания перед парами."
+    )
+
+
+@router.message(Command("status"))
+async def cmd_status(message: types.Message):
+    status = "активны 🔔" if are_reminders_enabled() else "выключены 🔇 (режим практики)"
+    await message.answer(f"📢 <b>Текущий статус уведомлений:</b> {status}")

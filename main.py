@@ -23,6 +23,7 @@ from config import TOKEN, CHAT_ID, REMINDER_BEFORE, MORNING_SUMMARY_TIME, DAYS_R
 from scheduler import now_almaty, format_day, get_reminder_times
 from handlers.schedule import router
 from infrastructure.keepalive import start_health_server, keepalive_loop
+from settings import are_reminders_enabled
 
 # ── Bot & Dispatcher ─────────────────────────────────────────
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
@@ -41,6 +42,7 @@ async def reminder_loop() -> None:
     Runs every 30 s, checks current time against schedule,
     and sends alerts via Telegram when appropriate.
     """
+    global sent_today
     while True:
         try:
             if CHAT_ID is None:
@@ -50,13 +52,18 @@ async def reminder_loop() -> None:
             now = now_almaty()
             cur = now.strftime("%H:%M")
             day_name = now.strftime("%A")
+            today_prefix = now.strftime("%Y-%m-%d")
 
-            # Reset at midnight
-            if cur == "00:00":
-                sent_today.clear()
+            # Самоочистка: удаляем устаревшие ключи из sent_today
+            sent_today = {k for k in sent_today if k.startswith(today_prefix)}
+
+            # Если уведомления отключены, ничего не присылаем
+            if not are_reminders_enabled():
+                await asyncio.sleep(30)
+                continue
 
             # ── Morning summary ─────────────────────────────
-            morning_key = f"{now.strftime('%d')}_morning"
+            morning_key = f"{today_prefix}_morning"
             if cur == MORNING_SUMMARY_TIME and morning_key not in sent_today:
                 day_ru = DAYS_RU.get(day_name, day_name)
                 date_str = now.strftime("%d.%m")
@@ -72,7 +79,7 @@ async def reminder_loop() -> None:
             # ── Pre-lesson reminders ────────────────────────
             reminders = get_reminder_times(day_name, REMINDER_BEFORE)
             for r in reminders:
-                key = f"{now.strftime('%d')}_r_{r['time_hhmm']}"
+                key = f"{today_prefix}_r_{r['time_hhmm']}"
                 if cur == r["time_hhmm"] and key not in sent_today:
                     await bot.send_message(
                         CHAT_ID,
