@@ -2,115 +2,189 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Расписание занятий</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Schedule // Linear</title>
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <link rel="stylesheet" href="/static/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+  <div class="glow-bg"></div>
+
   <div class="app-container">
-    <!-- Header -->
+    <!-- Header with Burger Menu -->
     <header class="app-header">
       <div class="header-left">
-        <span class="badge date-badge" id="currentDateBadge">Загрузка...</span>
-        <h1 class="header-title">Расписание</h1>
+        <div class="meta-row">
+          <span class="status-indicator-dot"></span>
+          <span class="meta-badge" id="currentDateBadge">SYNCING...</span>
+        </div>
+        <h1 class="header-title">4 КУРС <span class="dimmed">// РАСПИСАНИЕ</span></h1>
       </div>
       <div class="header-actions">
-        <button class="icon-btn" id="openBellsBtn" title="Расписание звонков">
+        <button class="header-btn" id="burgerBtn" title="Меню" aria-label="Меню">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
-          <span>Звонки</span>
-        </button>
-        <button class="icon-btn icon-only" id="refreshBtn" title="Обновить">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
       </div>
     </header>
 
-    <!-- Live Status Widget -->
-    <section class="live-status-card" id="liveStatusCard">
-      <div class="live-status-header">
-        <div class="live-indicator">
-          <span class="pulse-dot"></span>
-          <span id="liveStatusLabel">Проверка статуса...</span>
+    <!-- Bento Hero: Live Status & Day Survival -->
+    <section class="bento-hero" id="liveHeroCard">
+      <div class="hero-top">
+        <div class="hero-status-pill" id="liveStatusPill">
+          <span class="status-dot"></span>
+          <span class="status-text" id="liveStatusText">ПРОВЕРКА СТАТУСА</span>
         </div>
-        <span class="live-time" id="liveClock">--:--</span>
+        <div class="hero-clock" id="liveClock">00:00</div>
       </div>
-      <div class="live-status-body" id="liveStatusBody">
-        <div class="live-lesson-title">Загрузка информации...</div>
+
+      <div class="hero-content" id="liveHeroContent">
+        <div class="hero-skeleton"></div>
+      </div>
+
+      <!-- Day Progress & Survival Meter -->
+      <div class="survival-meter" id="survivalMeter">
+        <div class="survival-info">
+          <span class="survival-label">ПРОГРЕСС ДНЯ</span>
+          <span class="survival-val" id="survivalVal">0 / 0 ПАР</span>
+        </div>
+        <div class="survival-track" id="survivalTrack">
+          <!-- Populated dynamically: blocks -->
+        </div>
       </div>
     </section>
 
-    <!-- Search & Filter -->
-    <div class="search-container">
-      <div class="search-box">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <input type="text" id="searchInput" placeholder="Поиск предмета, преподавателя, кабинета..." autocomplete="off">
-        <button class="clear-search-btn hidden" id="clearSearchBtn">&times;</button>
-      </div>
-    </div>
-
-    <!-- Day Navigation Tabs -->
-    <nav class="days-nav" id="daysNav">
-      <button class="day-tab" data-day="Monday">
-        <span class="tab-day">Пн</span>
-        <span class="tab-dot"></span>
+    <!-- Day Selector (Pills) -->
+    <nav class="day-tabs-bar" id="daysNav">
+      <button class="tab-pill" data-day="Monday">
+        <span class="tab-abbr">ПН</span>
+        <span class="tab-status-dot"></span>
       </button>
-      <button class="day-tab" data-day="Tuesday">
-        <span class="tab-day">Вт</span>
-        <span class="tab-dot"></span>
+      <button class="tab-pill" data-day="Tuesday">
+        <span class="tab-abbr">ВТ</span>
+        <span class="tab-status-dot"></span>
       </button>
-      <button class="day-tab" data-day="Wednesday">
-        <span class="tab-day">Ср</span>
-        <span class="tab-dot"></span>
+      <button class="tab-pill" data-day="Wednesday">
+        <span class="tab-abbr">СР</span>
+        <span class="tab-status-dot"></span>
       </button>
-      <button class="day-tab" data-day="Thursday">
-        <span class="tab-day">Чт</span>
-        <span class="tab-dot"></span>
+      <button class="tab-pill" data-day="Thursday">
+        <span class="tab-abbr">ЧТ</span>
+        <span class="tab-status-dot"></span>
       </button>
-      <button class="day-tab" data-day="Friday">
-        <span class="tab-day">Пт</span>
-        <span class="tab-dot"></span>
+      <button class="tab-pill" data-day="Friday">
+        <span class="tab-abbr">ПТ</span>
+        <span class="tab-status-dot"></span>
       </button>
     </nav>
 
-    <!-- Day Title Bar -->
-    <div class="day-header">
-      <h2 class="current-day-name" id="selectedDayName">Понедельник</h2>
-      <span class="lessons-count-badge" id="lessonsCountBadge">0 пар</span>
+    <!-- Search Command Bar -->
+    <div class="search-wrap">
+      <div class="search-inner">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Поиск (предмет, преподаватель, кабинет)..." autocomplete="off" spellcheck="false">
+        <button class="search-clear hidden" id="clearSearchBtn">&times;</button>
+      </div>
     </div>
 
-    <!-- Lessons List -->
-    <main class="lessons-list" id="lessonsList">
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Загрузка расписания...</p>
+    <!-- Section Header -->
+    <div class="section-bar">
+      <div class="section-title-wrap">
+        <h2 class="section-day" id="selectedDayName">ПОНЕДЕЛЬНИК</h2>
+        <span class="section-count" id="lessonsCountBadge">0 ПАР</span>
+      </div>
+      <button class="quick-bells-btn" id="quickBellsBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span>ЗВОНКИ</span>
+      </button>
+    </div>
+
+    <!-- Timeline Lessons List -->
+    <main class="timeline-feed" id="lessonsList">
+      <div class="feed-skeleton">
+        <div class="skel-card"></div>
+        <div class="skel-card"></div>
       </div>
     </main>
+  </div>
 
-    <!-- Bells Modal -->
-    <div class="modal-overlay hidden" id="bellsModal">
-      <div class="modal-card">
-        <div class="modal-header">
-          <h3>Расписание звонков</h3>
-          <button class="close-modal-btn" id="closeBellsBtn">&times;</button>
+  <!-- Side Drawer (Burger Menu) -->
+  <div class="drawer-backdrop hidden" id="drawerBackdrop">
+    <aside class="drawer-panel" id="drawerPanel">
+      <div class="drawer-header">
+        <div class="drawer-title-group">
+          <span class="drawer-tag">SYS // MENU</span>
+          <h3 class="drawer-title">Настройки и опции</h3>
         </div>
-        <div class="modal-body" id="bellsList">
-          <!-- Populated by JS -->
-        </div>
+        <button class="drawer-close-btn" id="closeDrawerBtn">&times;</button>
       </div>
-    </div>
+
+      <div class="drawer-body">
+        <!-- Bells quick table -->
+        <section class="drawer-section">
+          <div class="drawer-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span>Расписание звонков</span>
+          </div>
+          <div class="bells-grid" id="drawerBellsList">
+            <!-- Populated via JS -->
+          </div>
+        </section>
+
+        <!-- Bot commands cheat sheet -->
+        <section class="drawer-section">
+          <div class="drawer-section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 17 10 11 4 5"></polyline>
+              <line x1="12" y1="19" x2="20" y2="19"></line>
+            </svg>
+            <span>Команды бота в чате</span>
+          </div>
+          <div class="commands-list">
+            <div class="cmd-item">
+              <code>/app</code>
+              <span>Открыть это мини-приложение</span>
+            </div>
+            <div class="cmd-item">
+              <code>/mute</code>
+              <span>Заглушить авто-уведомления (практика)</span>
+            </div>
+            <div class="cmd-item">
+              <code>/unmute</code>
+              <span>Включить уведомления перед парами</span>
+            </div>
+            <div class="cmd-item">
+              <code>/status</code>
+              <span>Проверить статус работы бота</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Group Info -->
+        <section class="drawer-section drawer-footer-section">
+          <div class="group-badge-card">
+            <div class="badge-title">4 КУРС · ВЫПУСКНОЙ</div>
+            <div class="badge-sub">Asia/Almaty (UTC+5) · Версия 2.0</div>
+          </div>
+        </section>
+      </div>
+    </aside>
   </div>
 
   <script src="/static/app.js"></script>
