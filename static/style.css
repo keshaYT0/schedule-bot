@@ -1,0 +1,528 @@
+:root {
+  --bg-color: var(--tg-theme-bg-color, #f4f5f8);
+  --text-color: var(--tg-theme-text-color, #1a1a1c);
+  --hint-color: var(--tg-theme-hint-color, #8e8e93);
+  --link-color: var(--tg-theme-link-color, #2481cc);
+  --btn-color: var(--tg-theme-button-color, #2481cc);
+  --btn-text-color: var(--tg-theme-button-text-color, #ffffff);
+  --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+  --section-bg: var(--tg-theme-section-bg-color, #ffffff);
+  --border-color: rgba(0, 0, 0, 0.08);
+  --accent-green: #34c759;
+  --accent-blue: #007aff;
+  --accent-orange: #ff9500;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --border-color: rgba(255, 255, 255, 0.1);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.45;
+  padding-bottom: 30px;
+  min-height: 100vh;
+}
+
+.app-container {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 12px 16px;
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-top: 4px;
+}
+
+.header-left .date-badge {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--hint-color);
+}
+
+.header-title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-top: 2px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.icon-btn.icon-only {
+  padding: 8px;
+  border-radius: 50%;
+}
+
+.icon-btn:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+/* Live Status Card */
+.live-status-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.live-status-card.active-lesson {
+  border-left: 4px solid var(--accent-green);
+}
+
+.live-status-card.upcoming-lesson {
+  border-left: 4px solid var(--accent-orange);
+}
+
+.live-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--hint-color);
+}
+
+.live-status-card.active-lesson .pulse-dot {
+  background-color: var(--accent-green);
+  animation: pulse 1.8s infinite;
+}
+
+.live-status-card.upcoming-lesson .pulse-dot {
+  background-color: var(--accent-orange);
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(52, 199, 89, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+}
+
+.live-time {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--hint-color);
+}
+
+.live-lesson-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.live-lesson-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--hint-color);
+  margin-bottom: 10px;
+}
+
+.live-lesson-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.progress-container {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--accent-green);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* Search Box */
+.search-container {
+  margin-bottom: 14px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  gap: 8px;
+  color: var(--hint-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.search-box input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  color: var(--text-color);
+  font-family: inherit;
+}
+
+.search-box input::placeholder {
+  color: var(--hint-color);
+}
+
+.clear-search-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--hint-color);
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+/* Days Navigation */
+.days-nav {
+  display: flex;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  gap: 4px;
+}
+
+.day-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 4px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--hint-color);
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.day-tab.active {
+  background: var(--btn-color);
+  color: var(--btn-text-color);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.day-tab.is-today .tab-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent-orange);
+}
+
+.day-tab.active.is-today .tab-dot {
+  background: #ffffff;
+}
+
+/* Day Header */
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.current-day-name {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.lessons-count-badge {
+  font-size: 12px;
+  color: var(--hint-color);
+  font-weight: 500;
+}
+
+/* Lessons List */
+.lessons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lesson-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.lesson-card:active {
+  transform: scale(0.99);
+}
+
+.lesson-card.now-active {
+  border: 1.5px solid var(--accent-green);
+  box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.15);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.lesson-time-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.lesson-index {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--hint-color);
+}
+
+.now-tag {
+  background: var(--accent-green);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.lesson-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-color);
+}
+
+.card-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.info-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--hint-color);
+}
+
+.room-chip {
+  background: rgba(0, 122, 255, 0.08);
+  color: var(--link-color);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* Empty & Loading States */
+.empty-state, .loading-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--hint-color);
+}
+
+.empty-state h3 {
+  color: var(--text-color);
+  margin-bottom: 6px;
+  font-size: 16px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top-color: var(--btn-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 1000;
+  transition: opacity 0.25s ease;
+}
+
+.modal-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 540px;
+  background: var(--card-bg);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+  max-height: 80vh;
+  overflow-y: auto;
+  transform: translateY(0);
+  transition: transform 0.25s ease;
+}
+
+.modal-overlay.hidden .modal-card {
+  transform: translateY(100%);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.close-modal-btn {
+  background: rgba(0, 0, 0, 0.06);
+  border: none;
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--hint-color);
+}
+
+.bells-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bells-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+}
+
+.bells-row:last-child {
+  border-bottom: none;
+}
+
+.bells-name {
+  font-weight: 600;
+}
+
+.bells-time {
+  color: var(--hint-color);
+  font-weight: 500;
+}
+
+.hidden {
+  display: none !important;
+}

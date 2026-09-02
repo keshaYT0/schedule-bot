@@ -17,7 +17,7 @@ CHAT_ID = int(_chat_id_raw) if _chat_id_raw else None
 TZ = ZoneInfo("Asia/Almaty")
 
 REMINDER_BEFORE = 10          # напоминание за N минут до пары
-MORNING_SUMMARY_TIME = "12:00"  # утренняя сводка расписания
+MORNING_SUMMARY_TIME = "07:45"  # утренняя сводка расписания
 
 DAYS_RU = {
     "Monday":    "Понедельник",
@@ -38,17 +38,23 @@ DAYS_SHORT = {
 }
 
 BELLS = [
+    ("1 пара", "08:30", "10:00"),
+    ("2 пара", "10:10", "11:40"),
+    ("3 пара", "11:50", "13:20"),
     ("4 пара", "13:30", "15:00"),
     ("5 пара", "15:10", "16:40"),
     ("6 пара", "16:50", "18:10"),
     ("7 пара", "18:15", "19:35"),
 ]
 
-# ── Render keep-alive ────────────────────────────────────────
+# ── Render keep-alive & WebApp ──────────────────────────────
 #  RENDER_EXTERNAL_URL — the public URL assigned by Render,
 #  e.g. "https://schedule-bot-xxxx.onrender.com".
-#  If left empty, the self-ping loop is disabled (safe for local dev).
 RENDER_EXTERNAL_URL: str | None = os.getenv("RENDER_EXTERNAL_URL")
+
+#  WEBAPP_URL — URL for Telegram Mini App
+WEBAPP_URL: str = os.getenv("WEBAPP_URL") or RENDER_EXTERNAL_URL or "http://localhost:8080"
 
 #  Ping interval — must be shorter than Render's 15-min idle timeout.
 KEEPALIVE_INTERVAL_SEC: int = int(os.getenv("KEEPALIVE_INTERVAL_SEC", "600"))
+

@@ -19,7 +19,7 @@ import os
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 
-from config import TOKEN, CHAT_ID, REMINDER_BEFORE, MORNING_SUMMARY_TIME, DAYS_RU
+from config import TOKEN, CHAT_ID, REMINDER_BEFORE, MORNING_SUMMARY_TIME, DAYS_RU, WEBAPP_URL
 from scheduler import now_almaty, format_day, get_reminder_times
 from handlers.schedule import router
 from infrastructure.keepalive import start_health_server, keepalive_loop
@@ -119,8 +119,23 @@ async def main() -> None:
         logging.info("Cleaning up pending updates...")
         await bot.delete_webhook(drop_pending_updates=True)
 
+        # Configure Chat Menu Button if WebApp URL is HTTPS
+        if WEBAPP_URL.startswith("https://"):
+            try:
+                from aiogram.types import MenuButtonWebApp, WebAppInfo
+                await bot.set_chat_menu_button(
+                    menu_button=MenuButtonWebApp(
+                        text="Расписание",
+                        web_app=WebAppInfo(url=WEBAPP_URL),
+                    )
+                )
+                logging.info("Chat menu button set to WebApp: %s", WEBAPP_URL)
+            except Exception as e:
+                logging.warning("Failed to set WebApp menu button: %s", e)
+
         # Main polling loop (blocking)
         await dp.start_polling(bot)
+
 
     except (KeyboardInterrupt, SystemExit, asyncio.CancelledError):
         logging.info("Bot is shutting down...")

@@ -3,7 +3,7 @@ from aiogram import Router, types, F
 from aiogram.filters import Command, CommandStart
 
 from config import BELLS, DAYS_RU
-from keyboards import main_kb, weekday_inline_kb
+from keyboards import main_kb, weekday_inline_kb, web_app_inline_kb
 from scheduler import (
     now_almaty, format_day, format_week,
     current_lesson, next_lesson,
@@ -19,15 +19,24 @@ async def cmd_start(message: types.Message):
     await message.answer(
         f"👋 <b>Привет, {message.from_user.first_name}!</b>\n\n"
         "Я бот расписания твоей группы.\n"
-        "Используй кнопки, чтобы узнать:\n\n"
-        "📅  <b>Сегодня / Завтра</b> — расписание пар\n"
-        "📚  <b>Сейчас</b> — текущая пара с прогрессом\n"
-        "⏭  <b>След. пара</b> — что будет дальше\n"
-        "📋  <b>Неделя</b> — вся неделя целиком\n"
-        "🔔  <b>Звонки</b> — расписание звонков\n\n"
-        "Удачного дня! 🎓",
+        "📱 Теперь доступно удобное мини-приложение (Mini App) прямо в Telegram!\n\n"
+        "Используй кнопки ниже 👇",
+        reply_markup=web_app_inline_kb(),
+    )
+    await message.answer(
+        "Быстрые команды:",
         reply_markup=main_kb(),
     )
+
+
+# ── /app ─────────────────────────────────────────────────────
+@router.message(Command("app"))
+async def cmd_app(message: types.Message):
+    await message.answer(
+        "📱 <b>Открыть расписание в Telegram Mini App:</b>",
+        reply_markup=web_app_inline_kb(),
+    )
+
 
 
 # ── /help ────────────────────────────────────────────────────

@@ -62,13 +62,12 @@ async def _health_handler(request: web.Request) -> web.Response:
 # ---------------------------------------------------------------------------
 
 async def start_health_server() -> web.AppRunner:
-    """Start an ``aiohttp`` web server that binds to ``$PORT``.
+    """Start an ``aiohttp`` web server that binds to ``$PORT`` and serves Mini App."""
+    from web_app import setup_web_app
 
-    Returns:
-        The ``web.AppRunner`` instance for future cleanup/shutdown.
-    """
     app = web.Application()
     app.router.add_get("/health", _health_handler)
+    setup_web_app(app)
 
     runner = web.AppRunner(app, access_log=None)
     await runner.setup()
@@ -77,8 +76,9 @@ async def start_health_server() -> web.AppRunner:
     site = web.TCPSite(runner, host="0.0.0.0", port=port)
     await site.start()
 
-    logger.info("Health-check server listening on 0.0.0.0:%s", port)
+    logger.info("Health-check & Mini App server listening on 0.0.0.0:%s", port)
     return runner
+
 
 
 # ---------------------------------------------------------------------------

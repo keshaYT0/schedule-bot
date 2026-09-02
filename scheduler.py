@@ -130,3 +130,28 @@ def get_reminder_times(day_name: str, before_min: int) -> list[dict]:
             "room": lesson["room"],
         })
     return result
+
+
+def get_status() -> dict:
+    now = now_almaty()
+    day_name = now.strftime("%A")
+    day_ru = DAYS_RU.get(day_name, day_name)
+    current_minutes = now.hour * 60 + now.minute
+    is_weekend = day_name in ("Saturday", "Sunday")
+
+    curr = current_lesson(day_name, current_minutes) if not is_weekend else None
+    nxt = next_lesson(day_name, current_minutes) if not is_weekend else None
+
+    if nxt:
+        nxt = {**nxt, "starts_in": nxt.get("until", 0)}
+
+    return {
+        "day_name": day_name,
+        "day_ru": day_ru,
+        "date_str": now.strftime("%d.%m.%Y"),
+        "time_str": now.strftime("%H:%M"),
+        "is_weekend": is_weekend,
+        "current_lesson": curr,
+        "next_lesson": nxt,
+    }
+

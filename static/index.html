@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Расписание занятий</title>
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <span class="badge date-badge" id="currentDateBadge">Загрузка...</span>
+        <h1 class="header-title">Расписание</h1>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="openBellsBtn" title="Расписание звонков">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span>Звонки</span>
+        </button>
+        <button class="icon-btn icon-only" id="refreshBtn" title="Обновить">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Live Status Widget -->
+    <section class="live-status-card" id="liveStatusCard">
+      <div class="live-status-header">
+        <div class="live-indicator">
+          <span class="pulse-dot"></span>
+          <span id="liveStatusLabel">Проверка статуса...</span>
+        </div>
+        <span class="live-time" id="liveClock">--:--</span>
+      </div>
+      <div class="live-status-body" id="liveStatusBody">
+        <div class="live-lesson-title">Загрузка информации...</div>
+      </div>
+    </section>
+
+    <!-- Search & Filter -->
+    <div class="search-container">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Поиск предмета, преподавателя, кабинета..." autocomplete="off">
+        <button class="clear-search-btn hidden" id="clearSearchBtn">&times;</button>
+      </div>
+    </div>
+
+    <!-- Day Navigation Tabs -->
+    <nav class="days-nav" id="daysNav">
+      <button class="day-tab" data-day="Monday">
+        <span class="tab-day">Пн</span>
+        <span class="tab-dot"></span>
+      </button>
+      <button class="day-tab" data-day="Tuesday">
+        <span class="tab-day">Вт</span>
+        <span class="tab-dot"></span>
+      </button>
+      <button class="day-tab" data-day="Wednesday">
+        <span class="tab-day">Ср</span>
+        <span class="tab-dot"></span>
+      </button>
+      <button class="day-tab" data-day="Thursday">
+        <span class="tab-day">Чт</span>
+        <span class="tab-dot"></span>
+      </button>
+      <button class="day-tab" data-day="Friday">
+        <span class="tab-day">Пт</span>
+        <span class="tab-dot"></span>
+      </button>
+    </nav>
+
+    <!-- Day Title Bar -->
+    <div class="day-header">
+      <h2 class="current-day-name" id="selectedDayName">Понедельник</h2>
+      <span class="lessons-count-badge" id="lessonsCountBadge">0 пар</span>
+    </div>
+
+    <!-- Lessons List -->
+    <main class="lessons-list" id="lessonsList">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Загрузка расписания...</p>
+      </div>
+    </main>
+
+    <!-- Bells Modal -->
+    <div class="modal-overlay hidden" id="bellsModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Расписание звонков</h3>
+          <button class="close-modal-btn" id="closeBellsBtn">&times;</button>
+        </div>
+        <div class="modal-body" id="bellsList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
