@@ -78,11 +78,7 @@ async def cb_ai_hint(call: types.CallbackQuery):
     await call.answer()
     await call.message.answer(
         "💬 <b>ИИ-помощник</b>\n\n"
-        "<blockquote>Вы можете задать любой вопрос по расписанию или учёбе прямо в этот чат:</blockquote>\n\n"
-        "• <code>Где сидит Маликов в пятницу?</code>\n"
-        "• <code>Какая завтра вторая пара?</code>\n"
-        "• <code>Как сделать JOIN в MySQL?</code>\n"
-        "• <code>Придумай причину опоздания на 1 пару</code>"
+        "<blockquote>Напишите любой вопрос по расписанию или учёбе прямо в этот чат.</blockquote>"
     )
 
 
@@ -243,31 +239,25 @@ async def is_user_admin(message: types.Message) -> bool:
 @router.message(Command("mute", "silent"))
 async def cmd_mute(message: types.Message):
     if not await is_user_admin(message):
-        await message.answer("<code>ACCESS // DENIED:</code> требуются права администратора.")
+        await message.answer("⚠️ Требуются права администратора.")
         return
     set_reminders_enabled(False)
-    await message.answer(
-        "<code>NOTIFICATIONS // MUTED</code>\n\n"
-        "<blockquote>Автоматические утренние сводки и напоминания отключены.</blockquote>"
-    )
+    await message.answer("🔕 Автоматические напоминания и утренние сводки отключены.")
 
 
 @router.message(Command("unmute", "active"))
 async def cmd_unmute(message: types.Message):
     if not await is_user_admin(message):
-        await message.answer("<code>ACCESS // DENIED:</code> требуются права администратора.")
+        await message.answer("⚠️ Требуются права администратора.")
         return
     set_reminders_enabled(True)
-    await message.answer(
-        "<code>NOTIFICATIONS // ACTIVE</code>\n\n"
-        "<blockquote>Автоматические напоминания и утренние сводки включены.</blockquote>"
-    )
+    await message.answer("🔔 Автоматические напоминания и утренние сводки включены.")
 
 
 @router.message(Command("status"))
 async def cmd_status(message: types.Message):
-    status = "активны [ON]" if are_reminders_enabled() else "отключены [OFF]"
-    await message.answer(f"<code>NOTIFICATIONS // STATUS:</code> <b>{status}</b>")
+    status = "включены" if are_reminders_enabled() else "отключены"
+    await message.answer(f"🔔 Статус авто-напоминаний: <b>{status}</b>")
 
 
 # ── ИИ-Помощник (Groq) ───────────────────────────────────────
@@ -288,12 +278,9 @@ async def cmd_ai(message: types.Message):
     args = message.text.partition(" ")[2].strip()
     if not args:
         await message.answer(
-            "<code>AI // ASSISTANT</code>\n\n"
-            "<blockquote><b>Задайте вопрос сразу после команды:</b></blockquote>\n\n"
-            "• <code>/ai какие пары завтра и кто ведет?</code>\n"
-            "• <code>/ai в каком кабинете пара по робототехнике?</code>\n"
-            "• <code>/ai как написать JOIN в MySQL?</code>\n\n"
-            "<code>В личке с ботом можно писать напрямую без команды /ai.</code>"
+            "💬 <b>ИИ-помощник</b>\n\n"
+            "<blockquote>Напишите вопрос после команды: <code>/ai ваш вопрос</code>\n"
+            "В личке с ботом можно писать напрямую без команды.</blockquote>"
         )
         return
     await _send_ai_reply(message, args)
@@ -302,7 +289,7 @@ async def cmd_ai(message: types.Message):
 @router.message(Command("clear_ai", "reset_ai"))
 async def cmd_clear_ai(message: types.Message):
     clear_user_history(message.from_user.id)
-    await message.answer("<code>AI // CONTEXT:</code> история диалога очищена.")
+    await message.answer("💬 История диалога с ИИ очищена.")
 
 
 
