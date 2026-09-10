@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const roomChip = (cur.room && cur.room !== '—')
         ? `<span class="mono-chip room-chip">${ICONS.pin} ${escapeHtml(cur.room)}</span>`
-        : '';
+        : `<span class="mono-chip room-chip muted">${ICONS.pin} КАБИНЕТ НЕ УКАЗАН</span>`;
       const numLabel = cur.num ? `${cur.num} ПАРА · ` : '';
 
       liveHeroContent.innerHTML = `
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const roomChip = (nextL.room && nextL.room !== '—')
         ? `<span class="mono-chip room-chip">${ICONS.pin} ${escapeHtml(nextL.room)}</span>`
-        : '';
+        : `<span class="mono-chip room-chip muted">${ICONS.pin} КАБИНЕТ НЕ УКАЗАН</span>`;
       const numLabel = nextL.num ? `${nextL.num} ПАРА · ` : '';
       const shiftChip = statusData.shift?.label
         ? `<span class="mono-chip">✦ ${escapeHtml(statusData.shift.label.toUpperCase())}</span>`
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const isCurrent = currentLesson && currentLesson.name === lesson.name && currentLesson.start === lesson.start;
       const roomBadge = (lesson.room && lesson.room !== '—')
         ? `<span class="room-tag">${ICONS.pin} ${escapeHtml(lesson.room)}</span>`
-        : '';
+        : `<span class="room-tag room-muted">${ICONS.pin} Не указан</span>`;
       const subjectIcon = getSubjectIcon(lesson.name);
 
       return `
