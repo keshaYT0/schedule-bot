@@ -19,14 +19,12 @@ router = Router()
 # ── /start ───────────────────────────────────────────────────
 @router.message(CommandStart())
 async def cmd_start(message: types.Message):
-    name = message.from_user.first_name or "студент"
     await message.answer(
-        "<code>SCHEDULE // SYSTEM</code>\n\n"
-        f"<blockquote><b>Добро пожаловать, {name}</b>\n"
-        "Интерактивное расписание занятий и встроенный ИИ-ассистент.</blockquote>\n\n"
-        "▸ <b>Mini App:</b> таймлайн пар, звонки, поиск аудиторий\n"
-        "▸ <b>AI Chat:</b> быстрые ответы по расписанию и учебе в чате\n\n"
-        "<code>Для запуска нажмите кнопку ниже или задайте вопрос:</code>",
+        "✨ <b>Расписание занятий</b>\n"
+        "──────────────────────\n\n"
+        "<b>Главное меню</b>\n\n"
+        "<i>Актуальный таймлайн пар, расписание звонков и встроенный ИИ-помощник</i>\n\n"
+        "⊞ Выберите действие:",
         reply_markup=web_app_inline_kb(),
     )
 
@@ -35,8 +33,9 @@ async def cmd_start(message: types.Message):
 @router.message(Command("app"))
 async def cmd_app(message: types.Message):
     await message.answer(
-        "<code>SCHEDULE // APP</code>\n\n"
-        "<blockquote>Интерактивная веб-версия расписания доступна по кнопке ниже:</blockquote>",
+        "✨ <b>Расписание занятий</b>\n"
+        "──────────────────────\n\n"
+        "<i>Интерактивная веб-версия доступна по кнопке ниже:</i>",
         reply_markup=web_app_inline_kb(),
     )
 
@@ -45,17 +44,52 @@ async def cmd_app(message: types.Message):
 @router.message(Command("help"))
 async def cmd_help(message: types.Message):
     await message.answer(
-        "<code>SYSTEM // COMMANDS</code>\n\n"
-        "<blockquote><b>Справочник команд системы</b></blockquote>\n\n"
+        "✨ <b>Команды бота</b>\n"
+        "──────────────────────\n\n"
         "• <code>/app</code> — открыть интерактивное расписание\n"
-        "• <code>/ai &lt;запрос&gt;</code> — консультация с локальным ИИ\n"
-        "• <code>/clear_ai</code> — сбросить контекст диалога\n"
+        "• <code>/ai &lt;вопрос&gt;</code> — задать вопрос ИИ-помощнику\n"
+        "• <code>/clear_ai</code> — очистить историю диалога с ИИ\n"
         "• <code>/mute</code> — отключить автоматические уведомления\n"
         "• <code>/unmute</code> — включить авто-уведомления\n"
         "• <code>/status</code> — статус подсистемы напоминаний\n\n"
-        "<code>В личных сообщениях бот отвечает на любые вопросы текстом.</code>",
+        "<i>💡 В личных сообщениях боту можно просто писать вопросы текстом — ИИ ответит!</i>",
         reply_markup=web_app_inline_kb(),
     )
+
+
+# ── Callback-кнопки ──────────────────────────────────────────
+@router.callback_query(F.data == "btn_bells")
+async def cb_bells(call: types.CallbackQuery):
+    await call.answer()
+    header = (
+        "✨ <b>Расписание звонков</b>\n"
+        "──────────────────────\n\n"
+    )
+    table = "<pre>"
+    table += "┌──────┬───────┬───────┐\n"
+    table += "│ Пара │ Начало│ Конец │\n"
+    table += "├──────┼───────┼───────┤\n"
+    for name, start, end in BELLS:
+        num = name.split()[0]
+        table += f"│  {num}   │ {start} │ {end} │\n"
+    table += "└──────┴───────┴───────┘"
+    table += "</pre>"
+    await call.message.answer(header + table)
+
+
+@router.callback_query(F.data == "btn_ai_hint")
+async def cb_ai_hint(call: types.CallbackQuery):
+    await call.answer()
+    await call.message.answer(
+        "✨ <b>ИИ-помощник</b>\n"
+        "──────────────────────\n\n"
+        "<i>Вы можете задать любой вопрос по расписанию или учёбе прямо в этот чат:</i>\n\n"
+        "• <code>Где сидит Маликов в пятницу?</code>\n"
+        "• <code>Какая завтра вторая пара?</code>\n"
+        "• <code>Как сделать JOIN в MySQL?</code>\n"
+        "• <code>Придумай отмазку за опоздание на 1 пару</code>"
+    )
+
 
 
 
