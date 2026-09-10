@@ -39,11 +39,37 @@ def get_lesson_num(start_time: str) -> int:
     return 4  # фоллбек по умолчанию
 
 
+def get_shift_info(day_name: str) -> dict:
+    """Определяет смену дня (1 смена - с утра / 2 смена - с обеда)."""
+    lessons = SCHEDULE.get(day_name, [])
+    if not lessons:
+        return {"shift": 0, "name": "Выходной", "start": None, "label": "Выходной день"}
+    first_start = lessons[0]["start"]
+    h = int(first_start.split(":")[0])
+    if h < 12:
+        return {
+            "shift": 1,
+            "name": "1 смена",
+            "start": first_start,
+            "label": "1 смена (с утра)",
+        }
+    else:
+        return {
+            "shift": 2,
+            "name": "2 смена",
+            "start": first_start,
+            "label": "2 смена (с обеда)",
+        }
+
+
 # ── форматирование одного дня ────────────────────────────────
 def format_day(day_name: str) -> str:
     lessons = SCHEDULE.get(day_name)
     if not lessons:
         return "<blockquote>Выходной день. Занятий нет.</blockquote>"
+
+    shift_info = get_shift_info(day_name)
+    shift_badge = f"<blockquote><b>{shift_info['label'].upper()}</b> · Начало в {shift_info['start']}</blockquote>\n\n" if shift_info.get("shift") else ""
 
     lines = []
     for lesson in lessons:
@@ -54,7 +80,7 @@ def format_day(day_name: str) -> str:
             f"<b>{lesson['name']}</b>\n"
             f"▸ {lesson['teacher']}{room}</blockquote>"
         )
-    return "\n".join(lines)
+    return shift_badge + "\n".join(lines)
 
 
 
@@ -65,7 +91,9 @@ def format_week() -> str:
         lessons = SCHEDULE.get(eng)
         if not lessons:
             continue
-        header = f"━━━  <b>{rus}</b>  ━━━"
+        shift_info = get_shift_info(eng)
+        shift_str = f" · {shift_info['name']}" if shift_info.get("shift") else ""
+        header = f"━━━  <b>{rus}{shift_str}</b>  ━━━"
         items = []
         for lesson in lessons:
             i = get_lesson_num(lesson["start"])
@@ -152,6 +180,7 @@ def get_status() -> dict:
         "date_str": now.strftime("%d.%m.%Y"),
         "time_str": now.strftime("%H:%M"),
         "is_weekend": is_weekend,
+        "shift": get_shift_info(day_name),
         "current_lesson": curr,
         "next_lesson": nxt,
     }

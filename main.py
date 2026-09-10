@@ -70,7 +70,7 @@ async def reminder_loop() -> None:
                 content = format_day(day_name)
                 await bot.send_message(
                     CHAT_ID,
-                    f"<code>SCHEDULE // {day_ru.upper()} · {date_str}</code>\n\n"
+                    f"✨ <b>{day_ru} · {date_str}</b>\n\n"
                     f"{content}",
                 )
                 sent_today.add(morning_key)
@@ -83,7 +83,7 @@ async def reminder_loop() -> None:
                     room_str = f" · {r['room']}" if r.get('room') and r['room'] != '—' else ""
                     await bot.send_message(
                         CHAT_ID,
-                        f"<code>SCHEDULE // UPCOMING</code>\n\n"
+                        f"🔔 <b>Напоминание о паре</b>\n\n"
                         f"<blockquote><b>{r['lesson_num']} ПАРА</b>  <code>[{r['start_time']}]</code>\n"
                         f"<b>{r['lesson_name']}</b>\n"
                         f"▸ Начало через {REMINDER_BEFORE} минут{room_str}</blockquote>",

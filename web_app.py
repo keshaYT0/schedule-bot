@@ -32,10 +32,14 @@ def _json_response(data: dict) -> web.Response:
 
 
 async def api_schedule(request: web.Request) -> web.Response:
+    from scheduler import get_shift_info
+    days_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    shifts = {day: get_shift_info(day) for day in days_order}
     data = {
         "days": SCHEDULE,
         "days_ru": DAYS_RU,
-        "days_order": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "days_order": days_order,
+        "shifts": shifts,
     }
     return _json_response(data)
 

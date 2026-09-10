@@ -190,16 +190,25 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     } else if (nextL) {
       liveHeroCard.classList.add('is-upcoming');
-      liveStatusText.textContent = `СКОРО ПАРА // ЧЕРЕЗ ${nextL.starts_in}М`;
+      const shiftName = statusData.shift?.name || '';
+      if (nextL.starts_in > 90) {
+        liveStatusText.textContent = shiftName ? `${shiftName.toUpperCase()} // СТАРТ В ${nextL.start}` : `СТАРТ В ${nextL.start}`;
+      } else {
+        liveStatusText.textContent = `СКОРО ПАРА // ЧЕРЕЗ ${nextL.starts_in}М`;
+      }
 
       const roomChip = (nextL.room && nextL.room !== '—')
         ? `<span class="mono-chip room-chip">${ICONS.pin} ${escapeHtml(nextL.room)}</span>`
         : '';
       const numLabel = nextL.num ? `${nextL.num} ПАРА · ` : '';
+      const shiftChip = statusData.shift?.label
+        ? `<span class="mono-chip">✦ ${escapeHtml(statusData.shift.label.toUpperCase())}</span>`
+        : '';
 
       liveHeroContent.innerHTML = `
         <div class="hero-subject-name">Следующая: ${numLabel}${escapeHtml(nextL.name)}</div>
         <div class="hero-chips-row">
+          ${shiftChip}
           <span class="mono-chip">${ICONS.clock} СТАРТ В ${nextL.start}</span>
           ${roomChip}
           <span class="mono-chip">${ICONS.user} ${escapeHtml(nextL.teacher)}</span>
@@ -238,7 +247,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!scheduleData) return;
 
     const dayRu = scheduleData.days_ru[activeDay] || activeDay;
-    selectedDayName.textContent = dayRu.toUpperCase();
+    const shift = scheduleData?.shifts?.[activeDay];
+    const shiftBadge = shift?.label ? ` · ${shift.label.toUpperCase()}` : '';
+    selectedDayName.textContent = `${dayRu.toUpperCase()}${shiftBadge}`;
 
     const lessons = scheduleData.days[activeDay] || [];
     const filtered = lessons.filter(item => {
