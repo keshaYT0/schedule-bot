@@ -6,10 +6,11 @@ from config import DAYS_SHORT, WEBAPP_URL
 
 def web_app_inline_kb() -> InlineKeyboardMarkup:
     if WEBAPP_URL.startswith("https://"):
-        button = InlineKeyboardButton(text="📱 Открыть расписание (App)", web_app=WebAppInfo(url=WEBAPP_URL))
+        button = InlineKeyboardButton(text="Открыть расписание ↗", web_app=WebAppInfo(url=WEBAPP_URL))
     else:
-        button = InlineKeyboardButton(text="🌐 Открыть веб-версию", url=WEBAPP_URL)
+        button = InlineKeyboardButton(text="Открыть веб-версию ↗", url=WEBAPP_URL)
     return InlineKeyboardMarkup(inline_keyboard=[[button]])
+
 
 
 def main_kb():

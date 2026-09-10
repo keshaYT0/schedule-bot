@@ -19,40 +19,44 @@ router = Router()
 # ── /start ───────────────────────────────────────────────────
 @router.message(CommandStart())
 async def cmd_start(message: types.Message):
+    name = message.from_user.first_name or "студент"
     await message.answer(
-        f"👋 <b>Привет, {message.from_user.first_name}!</b>\n\n"
-        "Здесь всегда актуальное расписание занятий и звонков.\n\n"
-        "📱 <b>Нажми кнопку ниже</b>, чтобы открыть интерактивное расписание.\n"
-        "💬 Или просто задай любой вопрос прямо в чат — ИИ ответит!",
+        "<code>SCHEDULE // SYSTEM</code>\n\n"
+        f"<blockquote><b>Добро пожаловать, {name}</b>\n"
+        "Интерактивное расписание занятий и встроенный ИИ-ассистент.</blockquote>\n\n"
+        "▸ <b>Mini App:</b> таймлайн пар, звонки, поиск аудиторий\n"
+        "▸ <b>AI Chat:</b> быстрые ответы по расписанию и учебе в чате\n\n"
+        "<code>Для запуска нажмите кнопку ниже или задайте вопрос:</code>",
         reply_markup=web_app_inline_kb(),
     )
-
 
 
 # ── /app ─────────────────────────────────────────────────────
 @router.message(Command("app"))
 async def cmd_app(message: types.Message):
     await message.answer(
-        "📱 <b>Открыть расписание в Telegram Mini App:</b>",
+        "<code>SCHEDULE // APP</code>\n\n"
+        "<blockquote>Интерактивная веб-версия расписания доступна по кнопке ниже:</blockquote>",
         reply_markup=web_app_inline_kb(),
     )
-
 
 
 # ── /help ────────────────────────────────────────────────────
 @router.message(Command("help"))
 async def cmd_help(message: types.Message):
     await message.answer(
-        "📖 <b>Команды бота</b>\n\n"
-        "/app — открыть интерактивное расписание (Mini App)\n"
-        "/ai &lt;вопрос&gt; — задать вопрос ИИ-помощнику\n"
-        "/clear_ai — очистить историю диалога с ИИ\n"
-        "/mute — выключить авто-уведомления (режим практики)\n"
-        "/unmute — включить авто-уведомления обратно\n"
-        "/status — проверить статус уведомлений\n\n"
-        "💡 <i>В личке боту можно просто писать любые вопросы текстом (например: «какие пары завтра?») — ИИ сразу подскажет!</i>",
+        "<code>SYSTEM // COMMANDS</code>\n\n"
+        "<blockquote><b>Справочник команд системы</b></blockquote>\n\n"
+        "• <code>/app</code> — открыть интерактивное расписание\n"
+        "• <code>/ai &lt;запрос&gt;</code> — консультация с локальным ИИ\n"
+        "• <code>/clear_ai</code> — сбросить контекст диалога\n"
+        "• <code>/mute</code> — отключить автоматические уведомления\n"
+        "• <code>/unmute</code> — включить авто-уведомления\n"
+        "• <code>/status</code> — статус подсистемы напоминаний\n\n"
+        "<code>В личных сообщениях бот отвечает на любые вопросы текстом.</code>",
         reply_markup=web_app_inline_kb(),
     )
+
 
 
 
@@ -210,32 +214,31 @@ async def is_user_admin(message: types.Message) -> bool:
 @router.message(Command("mute", "silent"))
 async def cmd_mute(message: types.Message):
     if not await is_user_admin(message):
-        await message.answer("❌ У вас нет прав для отключения уведомлений (нужны права администратора).")
+        await message.answer("<code>ACCESS // DENIED:</code> требуются права администратора.")
         return
     set_reminders_enabled(False)
     await message.answer(
-        "🔇 <b>Уведомления отключены!</b>\n\n"
-        "Бот больше не будет присылать утренние сводки и напоминания о парах.\n"
-        "Вы по-прежнему можете запрашивать расписание вручную через кнопки."
+        "<code>NOTIFICATIONS // MUTED</code>\n\n"
+        "<blockquote>Автоматические утренние сводки и напоминания отключены.</blockquote>"
     )
 
 
 @router.message(Command("unmute", "active"))
 async def cmd_unmute(message: types.Message):
     if not await is_user_admin(message):
-        await message.answer("❌ У вас нет прав для включения уведомлений (нужны права администратора).")
+        await message.answer("<code>ACCESS // DENIED:</code> требуются права администратора.")
         return
     set_reminders_enabled(True)
     await message.answer(
-        "🔔 <b>Уведомления включены!</b>\n\n"
-        "Бот снова будет присылать утренние сводки в 12:00 и напоминания перед парами."
+        "<code>NOTIFICATIONS // ACTIVE</code>\n\n"
+        "<blockquote>Автоматические напоминания и утренние сводки включены.</blockquote>"
     )
 
 
 @router.message(Command("status"))
 async def cmd_status(message: types.Message):
-    status = "активны 🔔" if are_reminders_enabled() else "выключены 🔇 (режим практики)"
-    await message.answer(f"📢 <b>Текущий статус уведомлений:</b> {status}")
+    status = "активны [ON]" if are_reminders_enabled() else "отключены [OFF]"
+    await message.answer(f"<code>NOTIFICATIONS // STATUS:</code> <b>{status}</b>")
 
 
 # ── ИИ-Помощник (Groq) ───────────────────────────────────────
@@ -256,13 +259,12 @@ async def cmd_ai(message: types.Message):
     args = message.text.partition(" ")[2].strip()
     if not args:
         await message.answer(
-            "🤖 <b>ИИ-помощник группы</b>\n\n"
-            "Задайте любой вопрос после команды:\n"
-            "• <code>/ai кто ведет робототехнику?</code>\n"
-            "• <code>/ai где сидит Маликов в пятницу?</code>\n"
-            "• <code>/ai как написать JOIN в MySQL?</code>\n"
-            "• <code>/ai придумай отмазку за опоздание на 1 пару</code>\n\n"
-            "<i>💡 В личных сообщениях боту можно писать вопросы даже без команды /ai!</i>"
+            "<code>AI // ASSISTANT</code>\n\n"
+            "<blockquote><b>Задайте вопрос сразу после команды:</b></blockquote>\n\n"
+            "• <code>/ai какие пары завтра и кто ведет?</code>\n"
+            "• <code>/ai в каком кабинете пара по робототехнике?</code>\n"
+            "• <code>/ai как написать JOIN в MySQL?</code>\n\n"
+            "<code>В личке с ботом можно писать напрямую без команды /ai.</code>"
         )
         return
     await _send_ai_reply(message, args)
@@ -271,7 +273,8 @@ async def cmd_ai(message: types.Message):
 @router.message(Command("clear_ai", "reset_ai"))
 async def cmd_clear_ai(message: types.Message):
     clear_user_history(message.from_user.id)
-    await message.answer("🧹 История диалога с ИИ очищена.")
+    await message.answer("<code>AI // CONTEXT:</code> история диалога очищена.")
+
 
 
 # ── Свободный текст в личных сообщениях ──────────────────────

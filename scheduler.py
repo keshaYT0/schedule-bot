@@ -43,18 +43,19 @@ def get_lesson_num(start_time: str) -> int:
 def format_day(day_name: str) -> str:
     lessons = SCHEDULE.get(day_name)
     if not lessons:
-        return "🏖 Выходной. Пар нет."
+        return "<blockquote>Выходной день. Занятий нет.</blockquote>"
 
     lines = []
     for lesson in lessons:
-        i = get_lesson_num(lesson["start"])
+        i = lesson.get("num") or get_lesson_num(lesson["start"])
+        room = f" · {lesson['room']}" if lesson.get("room") and lesson["room"] != "—" else ""
         lines.append(
-            f"┌ <b>{i} пара</b>  ·  {lesson['start']} – {lesson['end']}\n"
-            f"│ 📖 {lesson['name']}\n"
-            f"│ 👨‍🏫 {lesson['teacher']}\n"
-            f"└ 🏫 {lesson['room']}"
+            f"<blockquote><b>{i} ПАРА</b>  <code>[{lesson['start']} – {lesson['end']}]</code>\n"
+            f"<b>{lesson['name']}</b>\n"
+            f"▸ {lesson['teacher']}{room}</blockquote>"
         )
-    return "\n\n".join(lines)
+    return "\n".join(lines)
+
 
 
 # ── форматирование недели ────────────────────────────────────

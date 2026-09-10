@@ -70,8 +70,7 @@ async def reminder_loop() -> None:
                 content = format_day(day_name)
                 await bot.send_message(
                     CHAT_ID,
-                    f"☀️ <b>Доброе утро!</b>\n\n"
-                    f"📅 <b>{day_ru}  ·  {date_str}</b>\n\n"
+                    f"<code>SCHEDULE // {day_ru.upper()} · {date_str}</code>\n\n"
                     f"{content}",
                 )
                 sent_today.add(morning_key)
@@ -81,15 +80,16 @@ async def reminder_loop() -> None:
             for r in reminders:
                 key = f"{today_prefix}_r_{r['time_hhmm']}"
                 if cur == r["time_hhmm"] and key not in sent_today:
+                    room_str = f" · {r['room']}" if r.get('room') and r['room'] != '—' else ""
                     await bot.send_message(
                         CHAT_ID,
-                        f"🔔 <b>Напоминание!</b>\n\n"
-                        f"📚 <b>{r['lesson_num']} пара — {r['lesson_name']}</b>\n"
-                        f"🏫 {r['room']}\n"
-                        f"⏰ Начало в {r['start_time']}  "
-                        f"(через {REMINDER_BEFORE} мин.)",
+                        f"<code>SCHEDULE // UPCOMING</code>\n\n"
+                        f"<blockquote><b>{r['lesson_num']} ПАРА</b>  <code>[{r['start_time']}]</code>\n"
+                        f"<b>{r['lesson_name']}</b>\n"
+                        f"▸ Начало через {REMINDER_BEFORE} минут{room_str}</blockquote>",
                     )
                     sent_today.add(key)
+
 
         except Exception as e:
             logging.error("Reminder loop error: %s", e)
