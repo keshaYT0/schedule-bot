@@ -20,11 +20,9 @@ router = Router()
 @router.message(CommandStart())
 async def cmd_start(message: types.Message):
     await message.answer(
-        "✨ <b>Расписание занятий</b>\n"
-        "──────────────────────\n\n"
-        "<b>Главное меню</b>\n\n"
-        "<i>Актуальный таймлайн пар, расписание звонков и встроенный ИИ-помощник</i>\n\n"
-        "⊞ Выберите действие:",
+        "🔷 <b>Расписание занятий</b>\n\n"
+        "<blockquote>Актуальный таймлайн пар, расписание звонков и персональный ИИ-ассистент.</blockquote>\n\n"
+        "Выберите действие ниже:",
         reply_markup=web_app_inline_kb(),
     )
 
@@ -33,9 +31,8 @@ async def cmd_start(message: types.Message):
 @router.message(Command("app"))
 async def cmd_app(message: types.Message):
     await message.answer(
-        "✨ <b>Расписание занятий</b>\n"
-        "──────────────────────\n\n"
-        "<i>Интерактивная веб-версия доступна по кнопке ниже:</i>",
+        "🔷 <b>Расписание занятий</b>\n\n"
+        "<blockquote>Интерактивная веб-версия доступна по кнопке ниже:</blockquote>",
         reply_markup=web_app_inline_kb(),
     )
 
@@ -44,14 +41,14 @@ async def cmd_app(message: types.Message):
 @router.message(Command("help"))
 async def cmd_help(message: types.Message):
     await message.answer(
-        "✨ <b>Команды бота</b>\n"
-        "──────────────────────\n\n"
+        "🔷 <b>Справка и команды</b>\n\n"
+        "<blockquote>Быстрый доступ к возможностям бота:</blockquote>\n\n"
         "• <code>/app</code> — открыть интерактивное расписание\n"
         "• <code>/ai &lt;вопрос&gt;</code> — задать вопрос ИИ-помощнику\n"
         "• <code>/clear_ai</code> — очистить историю диалога с ИИ\n"
-        "• <code>/mute</code> — отключить автоматические уведомления\n"
-        "• <code>/unmute</code> — включить авто-уведомления\n"
-        "• <code>/status</code> — статус подсистемы напоминаний\n\n"
+        "• <code>/mute</code> — отключить напоминания о парах\n"
+        "• <code>/unmute</code> — включить напоминания о парах\n"
+        "• <code>/status</code> — статус подсистемы уведомлений\n\n"
         "<i>💡 В личных сообщениях боту можно просто писать вопросы текстом — ИИ ответит!</i>",
         reply_markup=web_app_inline_kb(),
     )
@@ -62,8 +59,7 @@ async def cmd_help(message: types.Message):
 async def cb_bells(call: types.CallbackQuery):
     await call.answer()
     header = (
-        "✨ <b>Расписание звонков</b>\n"
-        "──────────────────────\n\n"
+        "🔔 <b>Расписание звонков</b>\n\n"
     )
     table = "<pre>"
     table += "┌──────┬───────┬───────┐\n"
@@ -81,13 +77,12 @@ async def cb_bells(call: types.CallbackQuery):
 async def cb_ai_hint(call: types.CallbackQuery):
     await call.answer()
     await call.message.answer(
-        "✨ <b>ИИ-помощник</b>\n"
-        "──────────────────────\n\n"
-        "<i>Вы можете задать любой вопрос по расписанию или учёбе прямо в этот чат:</i>\n\n"
+        "💬 <b>ИИ-помощник</b>\n\n"
+        "<blockquote>Вы можете задать любой вопрос по расписанию или учёбе прямо в этот чат:</blockquote>\n\n"
         "• <code>Где сидит Маликов в пятницу?</code>\n"
         "• <code>Какая завтра вторая пара?</code>\n"
         "• <code>Как сделать JOIN в MySQL?</code>\n"
-        "• <code>Придумай отмазку за опоздание на 1 пару</code>"
+        "• <code>Придумай причину опоздания на 1 пару</code>"
     )
 
 
