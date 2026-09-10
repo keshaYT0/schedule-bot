@@ -9,8 +9,10 @@ from scheduler import (
     current_lesson, next_lesson,
 )
 from settings import are_reminders_enabled, set_reminders_enabled
+from ai_assistant import ask_ai, clear_user_history
 
 router = Router()
+
 
 
 # ── /start ───────────────────────────────────────────────────
@@ -45,7 +47,9 @@ async def cmd_help(message: types.Message):
     await message.answer(
         "📖 <b>Список команд</b>\n\n"
         "/start — перезапустить бота\n"
-        "/help — эта справка\n"
+        "/app — открыть Telegram Mini App\n"
+        "/ai &lt;вопрос&gt; — задать вопрос ИИ-помощнику группы\n"
+        "/clear_ai — очистить историю диалога с ИИ\n"
         "/mute — выключить авто-уведомления (режим практики)\n"
         "/unmute — включить авто-уведомления обратно\n"
         "/status — проверить статус уведомлений\n\n"
@@ -55,9 +59,9 @@ async def cmd_help(message: types.Message):
         "⏭ След. пара — следующая пара\n"
         "📋 Неделя — расписание Пн–Пт\n"
         "🔔 Звонки — расписание звонков\n\n"
-        "💡 Бот автоматически присылает напоминания\n"
-        "за 10 мин. до каждой пары и сводку утром.",
+        "💡 В личке боту можно писать любые вопросы текстом — ИИ ответит!",
     )
+
 
 
 # ── Звонки ───────────────────────────────────────────────────
@@ -239,3 +243,54 @@ async def cmd_unmute(message: types.Message):
 async def cmd_status(message: types.Message):
     status = "активны 🔔" if are_reminders_enabled() else "выключены 🔇 (режим практики)"
     await message.answer(f"📢 <b>Текущий статус уведомлений:</b> {status}")
+
+
+# ── ИИ-Помощник (Groq) ───────────────────────────────────────
+async def _send_ai_reply(message: types.Message, prompt: str):
+    await message.bot.send_chat_action(message.chat.id, action="typing")
+    reply = await ask_ai(message.from_user.id, prompt)
+    try:
+        await message.answer(reply, parse_mode="Markdown")
+    except Exception:
+        try:
+            await message.answer(reply, parse_mode="HTML")
+        except Exception:
+            await message.answer(reply, parse_mode=None)
+
+
+@router.message(Command("ai"))
+async def cmd_ai(message: types.Message):
+    args = message.text.partition(" ")[2].strip()
+    if not args:
+        await message.answer(
+            "🤖 <b>ИИ-помощник группы</b>\n\n"
+            "Задайте любой вопрос после команды:\n"
+            "• <code>/ai кто ведет робототехнику?</code>\n"
+            "• <code>/ai где сидит Маликов в пятницу?</code>\n"
+            "• <code>/ai как написать JOIN в MySQL?</code>\n"
+            "• <code>/ai придумай отмазку за опоздание на 1 пару</code>\n\n"
+            "<i>💡 В личных сообщениях боту можно писать вопросы даже без команды /ai!</i>"
+        )
+        return
+    await _send_ai_reply(message, args)
+
+
+@router.message(Command("clear_ai", "reset_ai"))
+async def cmd_clear_ai(message: types.Message):
+    clear_user_history(message.from_user.id)
+    await message.answer("🧹 История диалога с ИИ очищена.")
+
+
+# ── Свободный текст в личных сообщениях ──────────────────────
+@router.message(F.text, F.chat.type == "private")
+async def handle_private_free_text(message: types.Message):
+    text = message.text.strip()
+    if text.startswith("/"):
+        return
+    button_texts = {
+        "📅 Сегодня", "📅 Завтра", "📚 Сейчас",
+        "⏭ След. пара", "📋 Неделя", "🔔 Звонки", "📱 Mini App"
+    }
+    if text in button_texts:
+        return
+    await _send_ai_reply(message, text)

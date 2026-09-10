@@ -59,3 +59,7 @@ WEBAPP_URL: str = os.getenv("WEBAPP_URL") or RENDER_EXTERNAL_URL or "http://loca
 #  Ping interval — must be shorter than Render's 15-min idle timeout.
 KEEPALIVE_INTERVAL_SEC: int = int(os.getenv("KEEPALIVE_INTERVAL_SEC", "600"))
 
+# ── Groq AI ──────────────────────────────────────────────────
+GROQ_API_KEY: str | None = os.getenv("GROQ_API_KEY")
+
+
