@@ -3,7 +3,8 @@ from aiogram import Router, types, F
 from aiogram.filters import Command, CommandStart
 
 from config import BELLS, DAYS_RU
-from keyboards import main_kb, weekday_inline_kb, web_app_inline_kb
+from keyboards import weekday_inline_kb, web_app_inline_kb
+
 from scheduler import (
     now_almaty, format_day, format_week,
     current_lesson, next_lesson,
@@ -20,15 +21,12 @@ router = Router()
 async def cmd_start(message: types.Message):
     await message.answer(
         f"👋 <b>Привет, {message.from_user.first_name}!</b>\n\n"
-        "Я бот расписания твоей группы.\n"
-        "📱 Теперь доступно удобное мини-приложение (Mini App) прямо в Telegram!\n\n"
-        "Используй кнопки ниже 👇",
+        "Здесь всегда актуальное расписание занятий и звонков.\n\n"
+        "📱 <b>Нажми кнопку ниже</b>, чтобы открыть интерактивное расписание.\n"
+        "💬 Или просто задай любой вопрос прямо в чат — ИИ ответит!",
         reply_markup=web_app_inline_kb(),
     )
-    await message.answer(
-        "Быстрые команды:",
-        reply_markup=main_kb(),
-    )
+
 
 
 # ── /app ─────────────────────────────────────────────────────
@@ -45,22 +43,17 @@ async def cmd_app(message: types.Message):
 @router.message(Command("help"))
 async def cmd_help(message: types.Message):
     await message.answer(
-        "📖 <b>Список команд</b>\n\n"
-        "/start — перезапустить бота\n"
-        "/app — открыть Telegram Mini App\n"
-        "/ai &lt;вопрос&gt; — задать вопрос ИИ-помощнику группы\n"
+        "📖 <b>Команды бота</b>\n\n"
+        "/app — открыть интерактивное расписание (Mini App)\n"
+        "/ai &lt;вопрос&gt; — задать вопрос ИИ-помощнику\n"
         "/clear_ai — очистить историю диалога с ИИ\n"
         "/mute — выключить авто-уведомления (режим практики)\n"
         "/unmute — включить авто-уведомления обратно\n"
         "/status — проверить статус уведомлений\n\n"
-        "<b>Кнопки:</b>\n"
-        "📅 Сегодня / Завтра — расписание\n"
-        "📚 Сейчас — текущая пара\n"
-        "⏭ След. пара — следующая пара\n"
-        "📋 Неделя — расписание Пн–Пт\n"
-        "🔔 Звонки — расписание звонков\n\n"
-        "💡 В личке боту можно писать любые вопросы текстом — ИИ ответит!",
+        "💡 <i>В личке боту можно просто писать любые вопросы текстом (например: «какие пары завтра?») — ИИ сразу подскажет!</i>",
+        reply_markup=web_app_inline_kb(),
     )
+
 
 
 
